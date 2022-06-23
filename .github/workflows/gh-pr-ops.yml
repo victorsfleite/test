@@ -1,0 +1,32 @@
+name: Create Release PRs
+
+on:
+  push:
+    branches:
+      - "release/**"
+
+jobs:
+  create-release-prs:
+    runs-on: ubuntu-latest
+
+    env:
+      GITHUB_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
+
+    steps:
+      - name: "Checkout GitHub Action"
+        uses: actions/checkout@v2
+
+      - name: Get the branch name
+        id: vars
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+
+      - name: Create PR for the release branch
+        run: gh pr create --base main --title "${{ steps.vars.outputs.branch }}" --body "RC ${{ steps.vars.outputs.branch }}"
+
+      - name: Sleep for 30 seconds
+        shell: bash
+        run: sleep 30s
+
+      - name: Set the newly created PR to auto merge
+        run: gh pr merge --auto --merge

@@ -1,0 +1,47 @@
+name: Create Release
+
+on:
+  workflow_run:
+    workflows: ["Run PHP-CS-Fixer, Psalm, and PHPUnit"]
+    branches:
+      - main
+    types: [completed]
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+
+    env:
+      GITHUB_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          git fetch --prune --unshallow --tags
+
+      - name: setup git config
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+
+      - name: Bump version
+        id: prev-tag
+        shell: bash
+        run: |
+          source scripts/bump-version.sh
+          echo "release_tag=$release_tag" >> $GITHUB_ENV
+
+      - name: Tag the release
+        run: |
+          git tag -a ${{ env.release_tag }} -m "releasing ${{ env.release_tag }}"
+          git push origin --tags
+
+      - name: Create a draft release
+        run: |
+          echo -e "## Infrastructural Changes\n## Endpoints/Deployments/Features\n## Bugfixes" > body
+          export body=$(cat body)
+          gh release create ${{ env.release_tag }} \
+          --title "${{ env.release_tag }}" \
+          --target main \
+          --draft \
+          -n "$body"
