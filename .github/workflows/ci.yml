@@ -1,4 +1,4 @@
-name: Run PHP-CS-Fixer, Psalm, PHPUnit, and Coverage Checks
+name: Run PHP-CS-Fixer, Psalm, and PHPUnit
 
 on: push
 
