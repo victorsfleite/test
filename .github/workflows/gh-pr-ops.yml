@@ -26,7 +26,7 @@ jobs:
 
       - name: Sleep for 30 seconds
         shell: bash
-        run: sleep 30s
+        run: sleep 10s
 
       - name: Set the newly created PR to auto merge
         run: gh pr merge --auto --merge
