@@ -1,7 +1,9 @@
 name: Create Release
 
 on:
-  push:
+  workflow_run:
+    workflows: ["Run PHP-CS-Fixer, Psalm, and PHPUnit"]
+    types: [completed]
     branches: [main]
 
 jobs:
